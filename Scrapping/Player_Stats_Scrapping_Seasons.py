@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
-
 ## Librerías Básicas
 import pandas as pd
 import numpy as np
@@ -18,10 +15,6 @@ from selenium import webdriver
 import time
 from time import sleep
 
-
-# In[2]:
-
-
 ## Declaramos path y leemos archivo de urls
 path = "C:/Users/mibra/Desktop/NBA/"
 urls = pd.read_csv(path+"url_nba_teams.csv", header=0, sep=";")
@@ -29,10 +22,6 @@ urls = pd.read_csv(path+"url_nba_teams.csv", header=0, sep=";")
 ## Path para acceder a chromedriver
 path_to_chromedriver = path+'chromedriver.exe' 
 browser = webdriver.Chrome(executable_path=path_to_chromedriver)
-
-
-# In[3]:
-
 
 t0 = time.time()
 url = 'https://stats.nba.com/teams'
@@ -517,10 +506,3 @@ for section in range(1, 7):
 
 total_time = round((time.time() - t0)/60, 2)
 print("\nEnd Scrapping Player Stats Loop:", total_time)
-
-
-# In[ ]:
-
-
-
-
