@@ -1,23 +1,18 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
-
 ## Importamos las librerias
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from functools import reduce
-
 from keras import optimizers
 from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.layers import Dense, BatchNormalization, Dropout
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.optimizers import Adagrad, SGD
 from tensorflow.keras.wrappers.scikit_learn import KerasClassifier
-
 from sklearn.metrics import roc_curve, auc, confusion_matrix, classification_report, brier_score_loss
 from sklearn.calibration import calibration_curve
 from sklearn.ensemble import AdaBoostClassifier, RandomForestClassifier
@@ -26,16 +21,10 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from lightgbm import LGBMClassifier
 from xgboost import XGBClassifier
-
 import pickle
 import time
-
 import warnings
 warnings.filterwarnings('ignore')
-
-
-# In[2]:
-
 
 ## Indicamos el path
 path = "C:/Users/mibra/Desktop/NBA/"
@@ -50,9 +39,6 @@ print("\nEl tamaño del data set es:", dat.shape)
 pd.DataFrame(dat.groupby(["dataset", "w/l"])["w/l"].aggregate("count"))
 
 
-# In[3]:
-
-
 ## Contamos los posibles duplicados y los eliminamos
 duplicated_rows = dat.duplicated(subset='match_up').sum()   
 if (duplicated_rows > 0):
@@ -60,9 +46,6 @@ if (duplicated_rows > 0):
     print("Número de filas duplicadas eliminadas:", duplicated_rows)
 else:
     print("No se han encontrado filas duplicadas")
-
-
-# In[4]:
 
 
 ## Fijamos las variables para recuperar la predicción
@@ -109,9 +92,6 @@ print("El tamaño del target de test es:", y_test.shape)
 # 
 # [Documentación KNeighbors](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html#sklearn.neighbors.KNeighborsClassifier)
 
-# In[5]:
-
-
 ## Cargamos los parametros del modelo optimizado
 ab_params = pd.read_csv(path+"models/AdaBoost_Grid_Results.csv", sep=";", encoding='utf-8').iloc[0, 0:-5].to_dict()
 rf_params = pd.read_csv(path+"models/Random_Forest_Grid_Results.csv", sep=";").iloc[0, 0:-5].to_dict()
@@ -155,9 +135,6 @@ predictions.to_csv(path+"/models/All_Pred_Train.csv", sep=";", header=True, inde
 
 # ## Deep Stacking Model
 
-# In[6]:
-
-
 ## Generamos una función para típificar las predicciones del ensemble
 def tipify(data):
     ## Fijamos las predicciones
@@ -173,9 +150,6 @@ def tipify(data):
         data.iloc[:, i] = (data.iloc[:, i]-m[i])/s[i]
     data = pd.concat([fixed, data], axis=1)
     return (data, m, s)
-
-
-# In[7]:
 
 
 ## Tipificamos las predicciones
@@ -209,9 +183,6 @@ print("\nEl tamaño del set de test es:", X_test.shape)
 print("El tamaño del target de test es:", y_test.shape)
 
 
-# In[8]:
-
-
 ## Cargamos los valores del grid de la red neuronal
 nn_grid = pd.read_csv(path+'/models/NeuralNet_Grid_Results.csv', sep=";").iloc[0, 0:-5].to_dict()
 rate = nn_grid['rate']
@@ -242,9 +213,6 @@ model.compile(optimizer=opt, loss="binary_crossentropy", metrics=["acc"])
 model.summary()
 
 
-# In[9]:
-
-
 # Fijamos un callback para generrar un early_stopping y guardar el mejor modelo
 callbacks = [EarlyStopping(monitor='val_loss', patience=50),
              ModelCheckpoint(filepath=path + "best_classifier_nba.h5", monitor='val_loss', save_best_only=True)]
@@ -256,10 +224,6 @@ history = model.fit(x=X_train,
                     batch_size=batch_size,
                     validation_data=(X_val, y_val),
                     callbacks=callbacks)
-
-
-# In[10]:
-
 
 ## Agrupamos el entrenamiento en un dataframe
 hist = pd.DataFrame(history.history)
@@ -303,10 +267,6 @@ y_test_class_pred = model.predict_classes(X_test)
 results.to_csv(path+"Black_Mamba_Classifier_Metrics.csv", sep=";", header=True, index=False, decimal=",")
 print(results)
 
-
-# In[11]:
-
-
 ## Generamos una figura
 plt.figure(figsize=(12, 8))
 ax1 = plt.subplot2grid((3, 1), (0, 0), rowspan=2)
@@ -337,9 +297,6 @@ ax2.legend(loc="upper right")
 plt.tight_layout()
 
 
-# In[12]:
-
-
 ## Unimos las predicciones de ambos set de datos junto con las variables fijadas
 predictions = pd.DataFrame({"prediction": np.concatenate([y_train_class_pred[:,0], y_val_class_pred[:,0], y_test_class_pred[:,0]], axis=0),
                             "probability": np.concatenate([y_train_pred[:,0], y_val_pred[:,0], y_test_pred[:,0]], axis=0).round(2)})
@@ -354,9 +311,6 @@ results_dat["team2"] = results_dat['match_up'].str[15:22].str.split("@", expand=
 results_dat.to_csv(path+"Black_Mamba_Classifier_Predictions.csv", sep=";", header=True, index=False)
 
 
-# In[13]:
-
-
 ## Generamos una lista con las diferentes clases
 labels = ["0", "1"]
 
@@ -364,17 +318,6 @@ labels = ["0", "1"]
 report = classification_report(y_true=y_test, y_pred=y_test_class_pred, target_names=labels)
 
 print("Evaluación del modelo:\n", report)
-
-
-# In[14]:
-
-
-# from sklearn.metrics import plot_confusion_matrix
-# disp = plot_cofusion_matrix(clf, X_test, y_test, cmap='Blues', values_format='.3g')
-# disp.confusion_matrix
-
-
-# In[15]:
 
 
 ## Cargamos la función para visualizar la matriz de confusión
@@ -400,17 +343,6 @@ fig, ax= plt.subplots(figsize=(5, 5))
 plot_confusion_matrix(cm)
 plt.show()
 
-
-# In[16]:
-
-
-# from sklearn.metrics import plot_roc_curve
-# disp = plot_roc_curve(model, X_test, y_test)
-
-
-# In[17]:
-
-
 ## Cargamos la función para visualizar la curva roc
 def plot_roc_curve(fpr,tpr): 
     ## Obtenemos el AUC
@@ -431,13 +363,10 @@ def plot_roc_curve(fpr,tpr):
 fpr, tpr, thresholds = roc_curve(y_test, y_test_pred)    
 
 ## Ploteamos la curva roc
-plot_roc_curve (fpr, tpr) 
+plot_roc_curve(fpr, tpr) 
 
 
 # ## Final Model Training
-
-# In[18]:
-
 
 ## Leemos los archivos
 dat = pd.read_csv(path + "final_dat.csv", sep=";", header=0, encoding='latin-1')
@@ -449,9 +378,6 @@ y_train = dat.loc[:, "w/l"].values
 ## Imprimimos el tamaño de cada set de datos
 print("\nEl tamaño del set de train final es:", X_train.shape)
 print("El tamaño del target de train final es:", y_train.shape)
-
-
-# In[19]:
 
 
 ## Cargamos los parametros del modelo optimizado
@@ -492,9 +418,6 @@ for clf, name in model_list:
 predictions = pd.concat([fixed, predictions], axis=1)
 
 
-# In[20]:
-
-
 ## Tipificamos las predicciones
 predictions, m, s = tipify(predictions)
 
@@ -516,9 +439,6 @@ y_train = dat.loc[:, "w/l"].values
 ## Imprimimos el tamaño de cada set de datos
 print("\nEl tamaño del set de train es:", X_train.shape)
 print("El tamaño del target de train es:", y_train.shape)
-
-
-# In[21]:
 
 
 ## Cargamos los valores del grid de la red neuronal
@@ -551,9 +471,6 @@ model.compile(optimizer=opt, loss="binary_crossentropy", metrics=["acc"])
 model.summary()
 
 
-# In[22]:
-
-
 # Fijamos un callback para generrar un early_stopping y guardar el mejor modelo
 callbacks = [EarlyStopping(monitor='val_loss', patience=50),
              ModelCheckpoint(filepath=path + "Final_Black_Mamba_Model.h5", monitor='val_loss', save_best_only=True)]
@@ -565,4 +482,3 @@ model.fit(x=X_train,
           batch_size=batch_size,
           validation_split=0.05,
           callbacks=callbacks)
-
