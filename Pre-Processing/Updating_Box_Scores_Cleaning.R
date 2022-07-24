@@ -3,10 +3,9 @@
 ###################################### DATA CLEANING NBA ###################################### 
 ###############################################################################################
 
-
 ####################### Magic Variables ####################### 
 
-## Traza de ejecuci�n
+## Traza de ejecución
 time <- proc.time()
 
 ## Cargamos librerias
@@ -29,7 +28,7 @@ fixed_var <- c("match_up", "date", "w/l", "target", "dataset")
 ## Porcentajes de cada muestra
 perc_split <- c(0.8, 0.15, 0.05)
 
-## Tipo de división de la muestra
+## Tipo de divisiÃ³n de la muestra
 split_type <- 'temporal'
 
 ## Indicamos el numero de variables totales
@@ -38,7 +37,7 @@ num_imp_var <- 200
 
 ####################### Data Loading ####################### 
 
-## Cargamos el fichero básico
+## Cargamos el fichero bÃ¡sico
 nba <- fread(file.path(path, "url_nba_teams.csv"))
 nba <- nba[order(team)]
 
@@ -109,7 +108,7 @@ for (i in seq(1, nrow(scoring_dat))){
   ## Seleccionamos los jugadores para la tabla final
   temp <- stats_dat[codigo==t1 & !players %in% out_player1$x, -"codigo"][1:5]
   
-  ## Generamos el vector 1 y lo añadimos al dataframe
+  ## Generamos el vector 1 y lo aÃ±adimos al dataframe
   names1 <- c()
   vec1 <- data.table("try"="NULL")
   for (n in seq(1,5)){
@@ -136,7 +135,7 @@ for (i in seq(1, nrow(scoring_dat))){
   ## Seleccionamos los jugadores para la tabla final
   temp <- stats_dat[codigo==t2 & !players %in% out_player2$x][1:5]
   
-  ## Generamos el vector 2 y lo añadimos al dataframe
+  ## Generamos el vector 2 y lo aÃ±adimos al dataframe
   names2 <- c()
   vec2 <- data.table("try"="NULL")
   for (n in seq(1,5)){
@@ -177,7 +176,7 @@ if (sum(is.na(data))==0){
 ###### Train/Val Splitting ###### 
 
 if (split_type=="temporal"){
-  ## Ordenamos los datos según fecha de partido
+  ## Ordenamos los datos segÃºn fecha de partido
   data <- data[order(date), ]
   
 } else if (split_type=="random"){
@@ -211,11 +210,11 @@ data <- one_hot_encoding(data, categorical_var, numerical_var, fixed_var)
 fixed <- data[ ,intersect(colnames(data), fixed_var), with=F]
 data <- data[ , -setdiff(fixed_var, "dataset"), with =F]
 
-## Calculamos los vectores de media y desviación tipica
+## Calculamos los vectores de media y desviaciÃ³n tipica
 mean_vector <- sapply(data[dataset == "train", -"dataset", with = F], mean)
 sd_vector <- sapply(data[dataset == "train", -"dataset", with = F], sd)
 
-## Guardamos los vectores de tipificación
+## Guardamos los vectores de tipificaciÃ³n
 saveRDS(mean_vector, file.path(path, "mean_vector.rds"))
 saveRDS(sd_vector, file.path(path, "sd_vector.rds"))
 
@@ -247,7 +246,7 @@ data[(is.na(`w/l`) | `w/l`=="") & target > 0]$`w/l` <- "1"
 data[(is.na(`w/l`) | `w/l`=="") & target < 0]$`w/l` <- "0"
 data$`w/l` <- as.integer(data$`w/l`)
 
-## Obtenemos la correlaci�n entre variables
+## Obtenemos la correlación entre variables
 correlations <- abs(cor(data.table(target=data[dataset=="train"]$`w/l`, data[dataset=="train", -fixed_var, with=F])))
 
 ## Eliminamos las variables redundantes
@@ -258,12 +257,12 @@ print(sprintf("Variables redundantes eliminadas: %s", length(redundant_variables
 
 ###### Variable Importance ######
 
-## Obtenemos las variables m�s importantes
+## Obtenemos las variables más importantes
 important_variables <- select_important(data[dataset=="train"], data[dataset=="train"]$`w/l`)
 
 ## Visualizamos la curva de importancia y guardamos la imagen
 png(filename=file.path(path, "Importance_Variables.png"))
-plot(important_variables[1:1000]$Importance, type="s", xlab="N� Variables", ylab="Importancia", col="red")
+plot(important_variables[1:1000]$Importance, type="s", xlab="Nº Variables", ylab="Importancia", col="red")
 dev.off()
 
 ## Eliminamos las variables que no sean importantes
@@ -275,12 +274,11 @@ if (sum(is.na(data))==0){
   write.table(data, file.path(path, "final_dat.csv"), row.names=F, sep=";")
   print("Final Data Saved")
   
-  ## Guardamos las variables más importantes
+  ## Guardamos las variables mÃ¡s importantes
   write.table(important_variables, file.path(path, "important_variables.csv"), row.names=F, sep=";")
   print("Important Variables Saved")
 }
 
-## Traza de ejecuci�n
+## Traza de ejecución
 final_time <- round((proc.time() - time)/60,2)
-print(sprintf("Tiempo de ejecuci�n: %s min.", final_time[3]))
-
+print(sprintf("Tiempo de ejecución: %s min.", final_time[3]))
