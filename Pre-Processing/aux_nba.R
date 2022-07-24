@@ -3,7 +3,6 @@
 ###################################### AUX FUNCTIONS NBA ###################################### 
 ###############################################################################################
 
-
 ####################### One Hot Encoding ####################### 
 
 onehot <- function(x){
@@ -95,4 +94,3 @@ remove_redundant <- function(correlations, redundant_threshold){
   }
   redundant_variables <- unique(redundant_variables)
 } 
-
