@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
-
 ## Importamos las librerias
 import pandas as pd
 import numpy as np
@@ -32,10 +29,6 @@ import time
 import warnings
 warnings.filterwarnings('ignore')
 
-
-# In[2]:
-
-
 ## Indicamos el path
 path = "C:/Users/mibra/Desktop/NBA/"
 
@@ -49,9 +42,6 @@ print("\nEl tamaño del data set es:", dat.shape)
 pd.DataFrame(dat.groupby(["dataset", "w/l"])["w/l"].aggregate("count"))
 
 
-# In[3]:
-
-
 ## Contamos los posibles duplicados y los eliminamos
 duplicated_rows = dat.duplicated(subset='match_up').sum()   
 if (duplicated_rows > 0):
@@ -59,9 +49,6 @@ if (duplicated_rows > 0):
     print("Número de filas duplicadas eliminadas:", duplicated_rows)
 else:
     print("No se han encontrado filas duplicadas")
-
-
-# In[4]:
 
 
 ## Fijamos las variables para recuperar la predicción
@@ -92,9 +79,6 @@ print("El tamaño del target de test es:", y_test.shape)
 
 # ### AdaBoost
 # [Documentación AdaBoost](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.AdaBoostClassifier.html?highlight=ada#sklearn.ensemble.AdaBoostClassifier)
-
-# In[5]:
-
 
 ## Execution time
 t0 = time.time()
@@ -151,9 +135,6 @@ print("Total time:", round((t - t0)/3600,2), "horas")
 
 # ### Random Forest
 # [Documentación Random Forest](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html?highlight=random%20forest#sklearn.ensemble.RandomForestClassifier)
-
-# In[6]:
-
 
 ## Execution time
 t0 = time.time()
@@ -219,9 +200,6 @@ print("Total time:", round((t - t0)/3600, 2), "horas")
 # [Documentación XGBoost](https://xgboost.readthedocs.io/en/latest/parameter.html)
 # 
 # [Documentación Parametros](https://www.analyticsvidhya.com/blog/2016/03/complete-guide-parameter-tuning-xgboost-with-codes-python/)
-
-# In[7]:
-
 
 ## Execution time
 t0 = time.time()
@@ -290,9 +268,6 @@ print("Total time:", round((t - t0)/3600, 2), "horas")
 # 
 # [Documentación Parametros](https://medium.com/@pushkarmandot/https-medium-com-pushkarmandot-what-is-lightgbm-how-to-implement-it-how-to-fine-tune-the-parameters-60347819b7fc)
 
-# In[8]:
-
-
 ## Execution time
 t0 = time.time()
 
@@ -357,9 +332,6 @@ print("Total time:", round((t - t0)/3600,2), "horas")
 # 
 # [Documentación SVC](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html)
 
-# In[9]:
-
-
 ## Execution time
 t0 = time.time()
 
@@ -415,9 +387,6 @@ print("Total time:", round((t - t0)/3600,2), "horas")
 # ### Naive Bayes
 # 
 # [Documentación Naive Bayes](https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.BernoulliNB.html#sklearn.naive_bayes.BernoulliNB)
-
-# In[10]:
-
 
 ## Execution time
 t0 = time.time()
@@ -476,9 +445,6 @@ print("Total time:", round((t - t0)/3600,2), "horas")
 # 
 # [Documentación KNeighbors](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html#sklearn.neighbors.KNeighborsClassifier)
 
-# In[11]:
-
-
 ## Execution time
 t0 = time.time()
 
@@ -535,9 +501,6 @@ print("Total time:", round((t - t0)/3600,2), "horas")
 
 # ## Deep Stacking Model
 
-# In[12]:
-
-
 ## Generamos una función para típificar las predicciones del ensemble
 def tipify(data):
     ## Fijamos las predicciones
@@ -553,10 +516,6 @@ def tipify(data):
         data.iloc[:, i] = (data.iloc[:, i]-m[i])/s[i]
     data = pd.concat([fixed, data], axis=1)
     return (data, m, s)
-
-
-# In[13]:
-
 
 ## Cargamos todas las predicciones
 ab_pred = pd.read_csv(path+'models/AdaBoost_Predictions.csv', sep=";", header=0)
@@ -601,9 +560,6 @@ y_test = dat.loc[dat["dataset"]=="test", "w/l"].values
 print("\nEl tamaño del set de train es:", X_train.shape)
 print("El tamaño del set de val es:", X_val.shape)
 print("El tamaño del set de test es:", X_test.shape)
-
-
-# In[14]:
 
 
 ## Execution time
@@ -674,10 +630,3 @@ grid_results.to_csv(path+"/models/NeuralNet_Grid_Results.csv", sep=";", header=T
 ## Execution time
 t = time.time()
 print("Total time:", round((t - t0)/3600,2), "horas")
-
-
-# In[ ]:
-
-
-
-
