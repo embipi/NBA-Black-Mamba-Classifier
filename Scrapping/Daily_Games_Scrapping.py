@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
-
 ## Librerías Básicas
 import pandas as pd
 import numpy as np
@@ -17,10 +14,6 @@ warnings.filterwarnings('ignore')
 from selenium import webdriver
 import time
 from time import sleep
-
-
-# In[2]:
-
 
 ## Declaramos path y leemos archivo de urls
 path = "C:/Users/mibra/Desktop/NBA/"
@@ -43,10 +36,6 @@ path_to_chromedriver = path+'chromedriver.exe'
 ## Chrome automatizado
 browser = webdriver.Chrome(executable_path=path_to_chromedriver)
 
-
-# In[3]:
-
-
 ## Format URL
 url = 'https://www.nba.com/games?'
    
@@ -64,17 +53,13 @@ except:
     sleep(5)
     
 ## Eliminate spam   
-# try: 
-#     browser.find_element_by_xpath('/html/body/div[4]/div[2]/button').click()
-#     sleep(5)
-# except:
-#     sleep(5)
-#     browser.find_element_by_xpath('/html/body/div[4]/div[2]/button').click()
-#     sleep(5)
-
-
-# In[4]:
-
+try: 
+    browser.find_element_by_xpath('/html/body/div[4]/div[2]/button').click()
+    sleep(5)
+except:
+    sleep(5)
+    browser.find_element_by_xpath('/html/body/div[4]/div[2]/button').click()
+    sleep(5)
 
 t0 = time.time()
 
@@ -161,4 +146,3 @@ flag.to_csv(path+'/scripts/prod/flags/flag_Daily_Games_Scrapping.csv', header=Tr
 
 total_time = round((time.time() - t0)/60, 2)
 print("\nEnd Scrapping Daily Games Loop:", total_time)
-
