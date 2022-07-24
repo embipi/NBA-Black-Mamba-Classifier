@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
-
 ## Librerías Básicas
 import pandas as pd
 import numpy as np
@@ -22,10 +19,6 @@ from selenium import webdriver
 import time
 from time import sleep
 
-
-# In[2]:
-
-
 ## Declaramos path y leemos archivo de urls
 path = "C:/Users/mibra/Desktop/NBA/"
 urls = pd.read_csv(path+"url_nba_teams.csv", header=0, sep=";")
@@ -35,10 +28,6 @@ path_to_chromedriver = path+'chromedriver.exe'
 
 ## Chrome automatizado
 browser = webdriver.Chrome(executable_path=path_to_chromedriver)
-
-
-# In[3]:
-
 
 t0 = time.time()
 
@@ -95,7 +84,7 @@ for team in urls.url:
         sleep(5)
     except:
         sleep(5)
-#       browser.find_element_by_xpath('/html/body/main/div/div/div/div[4]/div/div/div/div/nba-stat-table/div[1]/div/div/select/option[1]').click()
+        browser.find_element_by_xpath('/html/body/main/div/div/div/div[4]/div/div/div/div/nba-stat-table/div[1]/div/div/select/option[1]').click()
         sleep(5)
     
     ######################## Obtain Box Scores table ########################
@@ -290,4 +279,3 @@ for team in urls.url:
         
 total_time = round((time.time() - t0)/60, 2)
 print("\nEnd Scrapping Scoring & Injuries Loop:", total_time)
-
