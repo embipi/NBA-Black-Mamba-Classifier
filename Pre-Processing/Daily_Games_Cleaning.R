@@ -3,7 +3,6 @@
 ###################################### DATA CLEANING NBA ###################################### 
 ###############################################################################################
 
-
 ####################### Magic Variables ####################### 
 
 ## Traza de ejecucion
@@ -207,7 +206,7 @@ for (i in seq(1, nrow(scoring_dat))){
   ## Seleccionamos los jugadores para la tabla final
   temp <- stats_dat[codigo==t1 & !players %in% out_player1$x, -"codigo"][1:5]
   
-  ## Generamos el vector 1 y lo añadimos al dataframe
+  ## Generamos el vector 1 y lo aÃ±adimos al dataframe
   names1 <- c()
   vec1 <- data.table("try"="NULL")
   for (n in seq(1,5)){
@@ -234,7 +233,7 @@ for (i in seq(1, nrow(scoring_dat))){
   ## Seleccionamos los jugadores para la tabla final
   temp <- stats_dat[codigo==t2 & !players %in% out_player2$x][1:5]
   
-  ## Generamos el vector 2 y lo a�adimos al dataframe
+  ## Generamos el vector 2 y lo añadimos al dataframe
   names2 <- c()
   vec2 <- data.table("try"="NULL")
   for (n in seq(1,5)){
@@ -306,7 +305,7 @@ data <- data[, colnames(data) %in% important_variables$Variables, with=F]
 
 ###### Tipify ###### 
 
-## Cargamos los vectores de media y desviaci�nn t�pica
+## Cargamos los vectores de media y desviaciónn típica
 mean_vector <- readRDS(file.path(path, "mean_vector.rds"))
 sd_vector <- readRDS(file.path(path, "sd_vector.rds"))
 
@@ -343,5 +342,3 @@ write.table(flag, file.path(path, "scripts/prod/flags/flag_Daily_Games_Cleaning.
 ## Traza de ejecucion
 final_time <- round((proc.time() - time)/60,2)
 print(sprintf("Tiempo de ejecucion: %s min.", final_time[3]))
-
-
