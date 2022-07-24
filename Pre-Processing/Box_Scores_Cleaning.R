@@ -3,10 +3,9 @@
 ###################################### DATA CLEANING NBA ###################################### 
 ###############################################################################################
 
-
 ####################### Magic Variables ####################### 
 
-## Traza de ejecución
+## Traza de ejecuciÃ³n
 time <- proc.time()
 
 ## Cargamos librerias
@@ -27,7 +26,7 @@ fixed_var <- c("match_up", "date", "w/l", "target", "dataset")
 
 ####################### Data Loading ####################### 
 
-## Cargamos el fichero básico
+## Cargamos el fichero bÃ¡sico
 nba <- fread(file.path(path, "url_nba_teams.csv"))
 nba <- nba[order(team)]
 
@@ -115,7 +114,7 @@ for (temporada in seq(1, length(season)-1)){
     ## Seleccionamos los jugadores para la tabla final
     temp <- stats_dat[codigo==t1 & !players %in% out_player1$x, -"codigo"][1:5]
     
-    ## Generamos el vector 1 y lo añadimos al dataframe
+    ## Generamos el vector 1 y lo aÃ±adimos al dataframe
     names1 <- c()
     vec1 <- data.table("try"="NULL")
     for (n in seq(1,5)){
@@ -142,7 +141,7 @@ for (temporada in seq(1, length(season)-1)){
     ## Seleccionamos los jugadores para la tabla final
     temp <- stats_dat[codigo==t2 & !players %in% out_player2$x][1:5]
     
-    ## Generamos el vector 2 y lo añadimos al dataframe
+    ## Generamos el vector 2 y lo aÃ±adimos al dataframe
     names2 <- c()
     vec2 <- data.table("try"="NULL")
     for (n in seq(1,5)){
@@ -168,16 +167,12 @@ for (temporada in seq(1, length(season)-1)){
 
 }
 
-
 if (sum(is.na(data))==0){
   ## Guardamos los datos codificados
   write.table(data, file.path(path, "clean_data_seasons.csv"), row.names=F, sep=";")
   print("Clean Data Seasons Saved")
 }
 
-
-# Traza de ejecución
+# Traza de ejecuciÃ³n
 final_time <- round((proc.time() - time)/60,2)
-print(sprintf("Tiempo de ejecuci�n: %s min.", final_time[3]))
-
-
+print(sprintf("Tiempo de ejecución: %s min.", final_time[3]))
