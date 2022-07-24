@@ -1,34 +1,21 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[14]:
-
-
 ## Importamos las librerias
 import pandas as pd
 import numpy as np
-
 from datetime import datetime, timedelta
-
 from selenium import webdriver
 from fake_useragent import UserAgent 
 from selenium.webdriver.chrome.options import Options
-
 import time
 from time import sleep
-
 from functools import reduce
 from tensorflow.keras.models import load_model
-
 import pickle
 import time
-
 import warnings
 warnings.filterwarnings('ignore')
-
-
-# In[3]:
-
 
 ## Indicamos el path
 path = "C:/Users/mibra/Desktop/NBA/"
@@ -45,9 +32,6 @@ print("\nEl tamaño del data set es:", data.shape)
 
 
 # ## Deep Stacking Model
-
-# In[3]:
-
 
 ## Cargamos los modelos 
 ab = pickle.load(open(path+'/models/AdaBoost_model_train.pkl', 'rb'))
@@ -73,10 +57,6 @@ predictions = pd.concat([fixed, predictions], axis=1)
 predictions.to_csv(path+"/models/All_Pred_Future_games.csv", sep=";", header=True, index=False)
 predictions
 
-
-# In[4]:
-
-
 ## Generamos una función para típificar las predicciones del ensemble
 def tipify_pred(data):
     ## Fijamos las predicciones
@@ -92,10 +72,6 @@ def tipify_pred(data):
         data.iloc[:, i] = (data.iloc[:, i]-m.iloc[i, 0])/s.iloc[i, 0]
     data = pd.concat([fixed, data], axis=1)
     return data
-
-
-# In[5]:
-
 
 ## Cargamos todas las predicciones
 pred = pd.read_csv(path+'models/All_Pred_Future_games.csv', sep=";", header=0)
@@ -115,9 +91,6 @@ data = data.drop(["match_up", "date"], axis=1).values
 print("\nEl tamaño del set es:", data.shape)
 
 
-# In[6]:
-
-
 ## Cargamos el modelo del checkpoint
 model = load_model(path + "Final_Black_Mamba_Model.h5")
 
@@ -130,9 +103,6 @@ results_dat = pd.concat([fixed, predictions], axis=1)
 ## Recuperamos los equipos de la key
 results_dat["team1"] = results_dat['match_up'].str[-7:].str.split("@", expand=True)[0]
 results_dat["team2"] = results_dat['match_up'].str[-7:].str.split("@", expand=True)[1]
-
-
-# In[7]:
 
 
 ## Agrupamos las predicciones por match_up y seleccionamos a que partidos apostar
@@ -159,9 +129,6 @@ final_results
 
 
 # ## Betting Odds Scrapping
-
-# In[1]:
-
 
 ## Loading urls data
 urls = pd.read_csv(path+"url_nba_teams.csv", sep=";")
@@ -195,9 +162,6 @@ options.add_argument(f'user-agent={userAgent}')
 browser = webdriver.Chrome(executable_path=path_to_chromedriver)
 
 
-# In[9]:
-
-
 ## Url of the betting web
 url = "https://s5.sir.sportradar.com/bet365/es/2/season/79153/fixtures/month/{}".format(date[0:7])
 
@@ -228,38 +192,6 @@ for line in range(0, len(table)):
                              "odds":[table[line].split(";")[5], table[line].split(";")[6]]})
         all_games = pd.concat([all_games, game], axis=0)
         
-# all_games = pd.DataFrame()
-# for line in range(0, len(table)):
-#     if ("-" == table[line]) & ("- - - - - - - -" != table[line+2]):
-#         try:
-#             game = pd.DataFrame({"teams":table[line-1:line+2:2], "odds":table[line+2:line+4]})
-#             all_games = pd.concat([all_games, game], axis=0)
-#         except:
-#             break
-#             print("Detected Error!")
-#     elif "- - - - - - - -" == table[line]:
-#         continue
-#     elif "1 2 3 4 TR PR" == table[line]:
-#         break
-        
-all_games
-
-
-# In[16]:
-
-
-# all_games = all_games.reset_index(drop=True)
-# all_games = all_games[:-2]
-# all_games
-# all_games1 = pd.DataFrame({"teams":["Miami", "Brooklyn" "Oklahoma City"], 
-#                            "odds": [2.30, 1.67, 3]})
-# all_games = pd.concat([all_games, all_games1], axis=0)
-# all_games
-
-
-# In[10]:
-
-
 ## Merge the data
 all_games = all_games.merge(urls.drop(["url", "section"], axis=1), left_on="teams", right_on="name").drop(["team", "teams", "name"], axis=1)
 final_results = final_results.merge(all_games, left_on="team1", right_on="codigo", how="left")
@@ -297,9 +229,6 @@ final_results = final_results.reset_index(drop=True)
 
 
 # ## Betting Rules
-
-# In[11]:
-
 
 ## Url of the standings web
 url = "https://stats.nba.com/standings/" 
@@ -370,9 +299,6 @@ west["Position"] = list(range(1, west.shape[0]+1))
 west = west.merge(urls.drop(["url", "section"], axis=1), left_on="Team", right_on="team").drop(["Team", "team", "name", "matches"], axis=1)
 
 
-# In[12]:
-
-
 ## Total games on the season
 total_games = 72
 
@@ -415,9 +341,6 @@ for i in range(0, final_results.shape[0]):
         final_results.loc[i, "team2_Playoff"] = 0
 
 final_results = final_results.fillna(0) 
-
-
-# In[13]:
 
 
 ## Applying rules to bet
@@ -485,9 +408,6 @@ final_results.loc[(final_results["betting"] == "Bet!: Team 2"), "odd_limit"] = (
 final_results
 
 
-# In[14]:
-
-
 ## Guardamos los picks
 picks = final_results.loc[(final_results["betting"]== "Bet!: Team 1") | (final_results["betting"]== "Bet!: Team 2")]
 
@@ -501,9 +421,6 @@ for i in range(0, len(picks)):
                              "Col.2":["", picks.iloc[i].pred_team2, picks.iloc[i].odds_prob2, picks.iloc[i].loc["EV%_2"], picks.iloc[i].odd_limit]})
     
     pick.to_csv(path + "daily_pred/picks/{}.csv".format(picks.iloc[i].match_up), sep=";", header=True, index=False)
-
-
-# In[15]:
 
 
 ## Saving results
@@ -520,16 +437,3 @@ historic.to_csv(path+"Black_Mamba_Classifier_Historic_Bettting.csv", sep=";", he
 ## Guardamos el flag de la ejecucion
 flag = pd.DataFrame({'flag':1}, index=[0])
 flag.to_csv(path+'/scripts/prod/flags/flag_Black_Mamba_Classifier_Predictor.csv', header=True, index=False)
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
